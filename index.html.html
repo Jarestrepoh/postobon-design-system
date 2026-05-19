@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System · Power BI · Postobón</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A1628;--navy-mid:#0D2149;--navy-light:#152A55;--navy-accent:#1E3A6E;
+  --blue-dark:#003087;--blue-mid:#0063A8;--blue-main:#0075BB;--blue:#288DC8;
+  --cyan:#93C9E4;--cyan-pale:#D0EAF6;
+  --green:#00B894;--amber:#FCDC00;--magenta:#D60078;--violet:#8973A0;
+  --success:#27AE60;--warning:#F39C12;--danger:#C0392B;
+  --gray-light:#F4F5F7;--gray-mid:#CDCDCD;--gray-dark:#888780;
+  --text:#1A2340;--text-muted:#64748B;--white:#FFFFFF;
+  --sidebar:240px;--header:56px;
+}
+html{font-family:'Segoe UI',Arial,Helvetica,sans-serif;font-size:14px;color:var(--text);background:var(--gray-light)}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOP BAR ── */
+.topbar{
+  height:var(--header);background:var(--navy);color:white;
+  display:flex;align-items:center;padding:0 20px;gap:16px;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-logo{font-family:'Arial Black',Arial;font-size:15px;font-weight:900;letter-spacing:.5px}
+.topbar-logo span{color:var(--cyan)}
+.topbar-badge{background:var(--blue);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.topbar-tag{font-size:11px;color:var(--cyan);opacity:.8}
+.search-box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 10px;color:white;font-size:12px;width:180px;outline:none}
+.search-box::placeholder{color:rgba(255,255,255,.45)}
+.search-box:focus{background:rgba(255,255,255,.15);border-color:var(--cyan)}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);background:var(--navy-mid);color:white;
+  padding:16px 0;position:sticky;top:var(--header);height:calc(100vh - var(--header));
+  overflow-y:auto;flex-shrink:0;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--navy-accent);border-radius:2px}
+.nav-section-label{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--cyan);padding:16px 20px 6px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;font-size:13px;color:rgba(255,255,255,.7)}
+.nav-item:hover{background:rgba(255,255,255,.06);color:white}
+.nav-item.active{background:rgba(40,141,200,.15);border-left-color:var(--blue);color:white}
+.nav-item-icon{font-size:16px;width:18px;text-align:center;flex-shrink:0}
+.nav-item-num{font-size:10px;color:var(--blue);font-weight:700;margin-left:auto;background:rgba(40,141,200,.2);padding:1px 6px;border-radius:10px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-x:hidden;padding:28px 32px;max-width:900px}
+
+/* ── SECTIONS ── */
+.section{display:none}
+.section.active{display:block}
+
+/* ── SECTION HEADER ── */
+.section-header{margin-bottom:24px}
+.section-num{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.section-title{font-family:'Arial Black',Arial;font-size:26px;font-weight:900;color:var(--navy);line-height:1.1}
+.section-sub{font-size:13px;color:var(--text-muted);margin-top:6px}
+.section-divider{height:2px;background:linear-gradient(90deg,var(--blue),transparent);margin:16px 0 24px;border-radius:1px}
+
+/* ── CARDS ── */
+.card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+
+/* ── COLOR PALETTE ── */
+.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+.color-chip{border-radius:8px;overflow:hidden;border:1px solid #E5E7EB;cursor:pointer;transition:transform .1s}
+.color-chip:hover{transform:translateY(-2px)}
+.color-chip:active{transform:scale(.97)}
+.chip-swatch{height:52px}
+.chip-info{padding:8px;background:white}
+.chip-name{font-size:11px;font-weight:700;color:var(--text);display:block;line-height:1.3}
+.chip-hex{font-size:10px;color:var(--text-muted);font-family:monospace;display:block;margin-top:2px}
+.chip-use{font-size:9px;color:var(--blue);font-style:italic;display:block;margin-top:2px}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none}
+.copy-toast.show{opacity:1}
+
+/* ── SEMANTIC COLORS ── */
+.semantic-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.semantic-card{border-radius:10px;padding:14px 16px;border-left:4px solid}
+
+/* ── TYPOGRAPHY ── */
+.typo-row{background:white;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:grid;grid-template-columns:160px 1fr auto;align-items:center;gap:16px}
+.typo-meta{}
+.typo-meta-role{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
+.typo-meta-spec{font-size:10px;color:var(--text-muted);margin-top:3px;font-style:italic}
+.typo-sample{min-width:0}
+.typo-badge{font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--cyan-pale);color:var(--blue-dark);white-space:nowrap}
+
+/* ── LAYOUT MOCKUP ── */
+.mock-frame{background:white;border:2px solid #E5E7EB;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.mock-header{background:var(--navy);color:white;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.mock-header-title{font-family:'Arial Black',Arial;font-size:11px}
+.mock-logo{background:var(--blue);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:4px}
+.mock-filters{background:var(--cyan-pale);padding:8px 14px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--cyan)}
+.mock-filter-chip{background:white;border:1px solid var(--blue);border-radius:6px;padding:3px 10px;font-size:10px;color:var(--blue-dark)}
+.mock-filter-chip.active{background:var(--blue-mid);color:white;border-color:var(--blue-mid)}
+.mock-kpi{background:var(--blue);display:flex}
+.mock-kpi-item{flex:1;padding:10px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.2);color:white}
+.mock-kpi-item:last-child{border-right:none}
+.mock-kpi-val{font-family:'Arial Black',Arial;font-size:18px;font-weight:900}
+.mock-kpi-lbl{font-size:8px;opacity:.8;margin-top:2px}
+.mock-content{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mock-content-box{background:var(--gray-light);border:1px dashed #CCC;border-radius:6px;height:70px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);font-style:italic}
+.mock-footer{background:#F4F5F7;padding:5px 14px;border-top:1px solid #E5E7EB;font-size:9px;color:var(--text-muted);text-align:center}
+
+/* ── ZONE LEGEND ── */
+.zone-legend{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.zone-card{border-radius:8px;padding:12px;border-left:3px solid}
+.zone-num{font-size:18px;font-weight:900;margin-bottom:4px}
+.zone-name{font-size:12px;font-weight:700;margin-bottom:4px}
+.zone-desc{font-size:11px;opacity:.85;line-height:1.4}
+
+/* ── COMPONENTS ── */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.comp-card{background:white;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden}
+.comp-card-header{padding:8px 12px;font-size:11px;font-weight:700;color:white}
+.comp-card-body{padding:14px 12px}
+.comp-spec{font-size:10px;color:var(--text-muted);font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid #F0F0F0}
+
+/* ── CHECKLIST ── */
+.checklist-item{background:white;border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.checklist-item:hover{background:#F9FAFB}
+.checklist-item.checked{background:#EFF7FD;border-color:var(--blue-mid)}
+.checklist-item.checked.oblig{background:#F0FFF6;border-color:var(--success)}
+.checkbox{width:20px;height:20px;border:2px solid #CCC;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:12px;color:white}
+.checklist-item.checked .checkbox{background:var(--blue-mid);border-color:var(--blue-mid)}
+.checklist-item.checked.oblig .checkbox{background:var(--success);border-color:var(--success)}
+.checklist-text{font-size:13px;color:var(--text);line-height:1.4;flex:1}
+.badge-oblig{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:#FDECEA;color:var(--danger);margin-left:6px;vertical-align:middle}
+.badge-rec{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--cyan-pale);color:var(--blue-dark);margin-left:6px;vertical-align:middle}
+.score-wrap{background:white;border:1px solid #E5E7EB;border-radius:10px;padding:16px;margin-top:16px}
+.score-bar-bg{background:#EEE;border-radius:20px;height:10px;overflow:hidden;margin:10px 0 6px}
+.score-bar-fill{height:100%;border-radius:20px;transition:width .4s,background .4s}
+.verdict{display:inline-block;margin-top:8px;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700}
+
+/* ── NAMING ── */
+.naming-parts{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.naming-part{border-radius:6px;padding:8px 14px;color:white;font-family:'Arial Black',Arial;font-size:12px;font-weight:900;text-align:center}
+.naming-sep{display:flex;align-items:center;font-size:18px;font-weight:900;color:var(--gray-mid)}
+.naming-sub{font-size:10px;font-weight:400;color:rgba(255,255,255,.75);display:block;margin-top:2px;font-family:Arial}
+.example-box{background:#EFF7FD;border:1px solid var(--cyan);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--blue-dark);margin-top:10px}
+
+/* ── FLOW ── */
+.flow{display:flex;gap:0;margin:16px 0;overflow-x:auto}
+.flow-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:100px}
+.flow-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Arial Black',Arial;font-size:16px;font-weight:900;color:white;background:var(--blue-mid);margin-bottom:6px;flex-shrink:0}
+.flow-label{font-size:11px;font-weight:700;color:var(--navy);text-align:center}
+.flow-desc{font-size:10px;color:var(--text-muted);text-align:center;margin-top:2px;line-height:1.3}
+.flow-arrow{display:flex;align-items:center;padding-top:14px;color:var(--blue);font-size:18px;margin:0 4px}
+
+/* ── REFERENCE ── */
+.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ref-card{background:white;border:1px solid #E5E7EB;border-radius:10px;padding:14px;border-left:4px solid var(--blue)}
+
+/* ── INTRO HERO ── */
+.hero{background:var(--navy);color:white;border-radius:16px;padding:32px;margin-bottom:28px;overflow:hidden;position:relative}
+.hero::after{content:'';position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;background:rgba(40,141,200,.12);border:1px solid rgba(147,201,228,.15)}
+.hero-badge{background:var(--blue);color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:4px;letter-spacing:1px;display:inline-block;margin-bottom:12px}
+.hero h1{font-family:'Arial Black',Arial;font-size:28px;font-weight:900;line-height:1.15;margin-bottom:10px}
+.hero h1 span{color:var(--cyan)}
+.hero p{font-size:13px;color:rgba(255,255,255,.75);max-width:520px;line-height:1.6;margin-bottom:20px}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap}
+.hero-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:11px;color:rgba(255,255,255,.85)}
+
+/* ── QUICK CARDS ── */
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.quick-card{background:white;border:1px solid #E5E7EB;border-radius:10px;padding:16px;cursor:pointer;transition:border-color .15s,transform .1s;text-align:center}
+.quick-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.quick-card:active{transform:scale(.98)}
+.quick-icon{font-size:26px;margin-bottom:8px}
+.quick-label{font-size:12px;font-weight:700;color:var(--navy)}
+.quick-sub{font-size:10px;color:var(--text-muted);margin-top:2px}
+
+/* ── RULES TABLE ── */
+.rules-table{width:100%;border-collapse:collapse;font-size:12px}
+.rules-table th{background:var(--navy);color:white;padding:8px 12px;text-align:left;font-weight:700}
+.rules-table td{padding:8px 12px;border-bottom:1px solid #F0F0F0;vertical-align:top}
+.rules-table tr:nth-child(even) td{background:#FAFAFA}
+.ok{color:var(--success);font-weight:700}
+.no{color:var(--danger);font-weight:700}
+
+/* ── SCROLLBAR ── */
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-track{background:transparent}
+.main::-webkit-scrollbar-thumb{background:var(--gray-mid);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">Power BI <span>·</span> Postobón</div>
+  <span class="topbar-badge">DESIGN SYSTEM v1.0</span>
+  <div class="topbar-right">
+    <span class="topbar-tag">Analítica BI/BA · Dirección TI</span>
+    <input class="search-box" id="searchBox" placeholder="Buscar en el Design System…" oninput="filterSearch(this.value)">
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="nav-section-label">Inicio</div>
+    <div class="nav-item active" onclick="showSection('inicio',this)">
+      <span class="nav-item-icon">⊞</span> Introducción
+    </div>
+
+    <div class="nav-section-label">Fundamentos</div>
+    <div class="nav-item" onclick="showSection('colores',this)">
+      <span class="nav-item-icon">◉</span> Colores
+      <span class="nav-item-num">12</span>
+    </div>
+    <div class="nav-item" onclick="showSection('tipografia',this)">
+      <span class="nav-item-icon">T</span> Tipografía
+      <span class="nav-item-num">6</span>
+    </div>
+
+    <div class="nav-section-label">Diseño</div>
+    <div class="nav-item" onclick="showSection('estructura',this)">
+      <span class="nav-item-icon">⊟</span> Estructura
+    </div>
+    <div class="nav-item" onclick="showSection('componentes',this)">
+      <span class="nav-item-icon">❏</span> Componentes
+      <span class="nav-item-num">4</span>
+    </div>
+    <div class="nav-item" onclick="showSection('reglas',this)">
+      <span class="nav-item-icon">✓</span> Reglas de diseño
+    </div>
+
+    <div class="nav-section-label">Gobernanza</div>
+    <div class="nav-item" onclick="showSection('checklist',this)">
+      <span class="nav-item-icon">☑</span> Checklist
+    </div>
+    <div class="nav-item" onclick="showSection('nomenclatura',this)">
+      <span class="nav-item-icon">#</span> Nomenclatura
+    </div>
+    <div class="nav-item" onclick="showSection('publicacion',this)">
+      <span class="nav-item-icon">↑</span> Publicación
+    </div>
+
+    <div class="nav-section-label">Referente</div>
+    <div class="nav-item" onclick="showSection('psug',this)">
+      <span class="nav-item-icon">★</span> Estilo PSUG
+    </div>
+  </nav>
+
+  <main class="main" id="mainContent">
+
+    <!-- INICIO -->
+    <section class="section active" id="s-inicio">
+      <div class="hero">
+        <span class="hero-badge">DESIGN SYSTEM v1.0 · 2025</span>
+        <h1>Marco de Gobierno<br><span>Tableros Power BI</span></h1>
+        <p>Estándares de diseño, estructura y publicación para el ecosistema analítico de Postobón. Haz clic en cualquier color para copiar su código hex.</p>
+        <div class="hero-pills">
+          <span class="hero-pill">Paleta corporativa</span>
+          <span class="hero-pill">Tipografía aprobada</span>
+          <span class="hero-pill">Estructura obligatoria</span>
+          <span class="hero-pill">Checklist interactivo</span>
+          <span class="hero-pill">Flujo de publicación</span>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+        <div class="quick-card" onclick="showSection('colores',document.querySelector('[onclick*=colores]'))">
+          <div class="quick-icon">◉</div>
+          <div class="quick-label">Colores</div>
+          <div class="quick-sub">12 tokens de color</div>
+        </div>
+        <div class="quick-card" onclick="showSection('tipografia',document.querySelector('[onclick*=tipografia]'))">
+          <div class="quick-icon">T</div>
+          <div class="quick-label">Tipografía</div>
+          <div class="quick-sub">6 niveles jerárquicos</div>
+        </div>
+        <div class="quick-card" onclick="showSection('estructura',document.querySelector('[onclick*=estructura]'))">
+          <div class="quick-icon">⊟</div>
+          <div class="quick-label">Estructura</div>
+          <div class="quick-sub">Plantilla obligatoria</div>
+        </div>
+        <div class="quick-card" onclick="showSection('componentes',document.querySelector('[onclick*=componentes]'))">
+          <div class="quick-icon">❏</div>
+          <div class="quick-label">Componentes</div>
+          <div class="quick-sub">Biblioteca visual</div>
+        </div>
+        <div class="quick-card" onclick="showSection('checklist',document.querySelector('[onclick*=checklist]'))">
+          <div class="quick-icon">☑</div>
+          <div class="quick-label">Checklist</div>
+          <div class="quick-sub">14 criterios de calidad</div>
+        </div>
+        <div class="quick-card" onclick="showSection('psug',document.querySelector('[onclick*=psug]'))">
+          <div class="quick-icon">★</div>
+          <div class="quick-label">Referente PSUG</div>
+          <div class="quick-sub">Estilo del reporte piloto</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Principio fundamental</div>
+        <blockquote style="border-left:3px solid var(--blue);padding-left:14px;color:var(--text-muted);font-style:italic;font-size:14px;line-height:1.6">
+          "El arte está en proporcionar la información correcta, en el momento correcto, en el orden correcto."<br>
+          <small style="color:var(--gray-mid);font-size:11px;font-style:normal">— Analítica BI/BA · Dirección TI · Postobón</small>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- COLORES -->
+    <section class="section" id="s-colores">
+      <div class="section-header">
+        <div class="section-num">01 · Fundamentos</div>
+        <div class="section-title">Colores</div>
+        <div class="section-sub">Haz clic en cualquier chip para copiar el código hex al portapapeles</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="card">
+        <div class="card-title">Paleta primaria · Azules corporativos</div>
+        <div class="color-grid" id="primaryColors"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Neutrales</div>
+        <div class="color-grid" id="neutralColors"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Colores complementarios (acento)</div>
+        <div class="color-grid" id="accentColors"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Semánticos — estados UI</div>
+        <div class="semantic-grid" id="semanticColors"></div>
+      </div>
+
+      <div class="card" style="background:var(--navy);border-color:var(--navy)">
+        <div class="card-title" style="color:var(--cyan)">Regla de uso por zona del tablero</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
+          <div style="text-align:center">
+            <div style="background:#003087;border-radius:8px;padding:12px;color:white;font-size:11px;font-weight:700;margin-bottom:6px">Header</div>
+            <code style="color:var(--cyan);font-size:10px">#003087</code>
+          </div>
+          <div style="text-align:center">
+            <div style="background:#D0EAF6;border-radius:8px;padding:12px;color:#003087;font-size:11px;font-weight:700;margin-bottom:6px">Filtros</div>
+            <code style="color:var(--cyan);font-size:10px">#D0EAF6</code>
+          </div>
+          <div style="text-align:center">
+            <div style="background:#288DC8;border-radius:8px;padding:12px;color:white;font-size:11px;font-weight:700;margin-bottom:6px">KPI Strip</div>
+            <code style="color:var(--cyan);font-size:10px">#288DC8</code>
+          </div>
+          <div style="text-align:center">
+            <div style="background:#F4F5F7;border-radius:8px;padding:12px;color:#1A2340;font-size:11px;font-weight:700;margin-bottom:6px">Contenido</div>
+            <code style="color:var(--cyan);font-size:10px">#F4F5F7</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIPOGRAFÍA -->
+    <section class="section" id="s-tipografia">
+      <div class="section-header">
+        <div class="section-num">02 · Fundamentos</div>
+        <div class="section-title">Tipografía</div>
+        <div class="section-sub">Jerarquía de fuentes aprobadas para todos los tableros</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="card" id="typoRows"></div>
+
+      <div class="card" style="background:#FDECEA;border-color:var(--danger)">
+        <div class="card-title" style="color:var(--danger)">Fuentes PROHIBIDAS</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span style="background:#F5C6C6;color:var(--danger);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">Calibri</span>
+          <span style="background:#F5C6C6;color:var(--danger);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">Times New Roman</span>
+          <span style="background:#F5C6C6;color:var(--danger);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">Comic Sans</span>
+          <span style="background:#F5C6C6;color:var(--danger);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">Georgia</span>
+          <span style="background:#F5C6C6;color:var(--danger);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">Fuentes no corporativas</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Fuentes aprobadas</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="border-left:3px solid var(--blue-dark);padding:10px 14px;background:#F9FAFB;border-radius:0 8px 8px 0">
+            <div style="font-family:'Arial Black',Arial;font-size:16px;font-weight:900;color:var(--navy);margin-bottom:4px">Arial Black</div>
+            <div style="font-size:11px;color:var(--text-muted)">Títulos principales · Prefijos APP · Valores KPI</div>
+          </div>
+          <div style="border-left:3px solid var(--blue);padding:10px 14px;background:#F9FAFB;border-radius:0 8px 8px 0">
+            <div style="font-family:Arial;font-size:15px;color:var(--navy);margin-bottom:4px">Arial / Helvetica / Raleway</div>
+            <div style="font-size:11px;color:var(--text-muted)">Cuerpo · Etiquetas · Tablas · Ejes · Pie de página</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTRUCTURA -->
+    <section class="section" id="s-estructura">
+      <div class="section-header">
+        <div class="section-num">03 · Diseño</div>
+        <div class="section-title">Estructura del tablero</div>
+        <div class="section-sub">Orden obligatorio: Filtros → KPI → Contenido · Logo · Contacto</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="card">
+        <div class="card-title">Plantilla visual obligatoria</div>
+        <div class="mock-frame">
+          <div class="mock-header">
+            <span class="mock-header-title">APP [ÁREA] · TABLERO [DESCRIPCIÓN]</span>
+            <span class="mock-logo">LOGO</span>
+          </div>
+          <div class="mock-filters">
+            <div class="mock-filter-chip active">Fecha</div>
+            <div class="mock-filter-chip">País</div>
+            <div class="mock-filter-chip">Categoría</div>
+            <div class="mock-filter-chip">Fuerza Ventas</div>
+            <div class="mock-filter-chip">Compañía</div>
+            <div class="mock-filter-chip" style="background:var(--blue-dark);color:white;border-color:var(--blue-dark)">Limpiar filtros</div>
+          </div>
+          <div class="mock-kpi">
+            <div class="mock-kpi-item"><div class="mock-kpi-val">20.986</div><div class="mock-kpi-lbl">Cajas físicas</div></div>
+            <div class="mock-kpi-item"><div class="mock-kpi-val">30.875</div><div class="mock-kpi-lbl">Cajas unitarias</div></div>
+            <div class="mock-kpi-item"><div class="mock-kpi-val">33.823</div><div class="mock-kpi-lbl">Vol. kilos venta</div></div>
+            <div class="mock-kpi-item"><div class="mock-kpi-val">6.564</div><div class="mock-kpi-lbl">Visitas efectivas</div></div>
+          </div>
+          <div class="mock-content">
+            <div class="mock-content-box">③ Gráfico o tabla de detalle</div>
+            <div class="mock-content-box">③ Gráfico o tabla de detalle</div>
+          </div>
+          <div class="mock-footer">Analítica BI/BA · Dirección TI · responsable@postobon.com</div>
+        </div>
+      </div>
+
+      <div class="zone-legend">
+        <div class="zone-card" style="background:#E8F4FD;border-color:var(--blue-mid)">
+          <div class="zone-num" style="color:var(--blue-mid)">①</div>
+          <div class="zone-name" style="color:var(--blue-dark)">Filtros</div>
+          <div class="zone-desc" style="color:var(--text-muted)">Fecha, Región, Categoría, Fuerza Venta, Compañía. Fondo cyan suave. Posición: parte superior.</div>
+        </div>
+        <div class="zone-card" style="background:#E3F4FA;border-color:var(--blue)">
+          <div class="zone-num" style="color:var(--blue)">②</div>
+          <div class="zone-name" style="color:var(--blue-dark)">KPI Strip</div>
+          <div class="zone-desc" style="color:var(--text-muted)">Métricas clave en tarjetas. Fondo azul claro. Mismo tamaño de fuente en todas las tarjetas.</div>
+        </div>
+        <div class="zone-card" style="background:#F4F5F7;border-color:var(--gray-mid)">
+          <div class="zone-num" style="color:var(--text-muted)">③</div>
+          <div class="zone-name" style="color:var(--text)">Contenido</div>
+          <div class="zone-desc" style="color:var(--text-muted)">Gráficos y tablas de detalle. Barras para comparar, líneas para tendencias, tortas ≤5 categorías.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPONENTES -->
+    <section class="section" id="s-componentes">
+      <div class="section-header">
+        <div class="section-num">04 · Diseño</div>
+        <div class="section-title">Componentes</div>
+        <div class="section-sub">Biblioteca de visuales aprobados con especificaciones de uso</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="comp-card-header" style="background:var(--blue-mid)">① Filtros / Segmentadores</div>
+          <div class="comp-card-body">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+              <div style="background:var(--blue-mid);color:white;border:1px solid var(--blue-mid);border-radius:6px;padding:4px 10px;font-size:11px">Todas</div>
+              <div style="background:var(--cyan-pale);color:var(--blue-dark);border:1px solid var(--cyan);border-radius:6px;padding:4px 10px;font-size:11px">Gaseosa</div>
+              <div style="background:var(--cyan-pale);color:var(--blue-dark);border:1px solid var(--cyan);border-radius:6px;padding:4px 10px;font-size:11px">Agua</div>
+              <div style="background:var(--cyan-pale);color:var(--blue-dark);border:1px solid var(--cyan);border-radius:6px;padding:4px 10px;font-size:11px">Jugos</div>
+            </div>
+            <div class="comp-spec">Fondo activo: #0063A8 · Inactivo: #D0EAF6 · Siempre incluir "Limpiar filtros"</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-header" style="background:var(--blue)">② Tarjetas KPI</div>
+          <div class="comp-card-body">
+            <div style="display:flex;gap:6px">
+              <div style="flex:1;background:var(--blue);border-radius:8px;padding:8px;text-align:center;color:white">
+                <div style="font-family:'Arial Black',Arial;font-size:18px;font-weight:900">484M</div>
+                <div style="font-size:8px;opacity:.8;margin-top:2px">Cajas físicas</div>
+              </div>
+              <div style="flex:1;background:var(--blue);border-radius:8px;padding:8px;text-align:center;color:white">
+                <div style="font-family:'Arial Black',Arial;font-size:18px;font-weight:900">880M</div>
+                <div style="font-size:8px;opacity:.8;margin-top:2px">Cajas unit.</div>
+              </div>
+              <div style="flex:1;background:var(--blue);border-radius:8px;padding:8px;text-align:center;color:white">
+                <div style="font-family:'Arial Black',Arial;font-size:18px;font-weight:900">646K</div>
+                <div style="font-size:8px;opacity:.8;margin-top:2px">Clientes</div>
+              </div>
+            </div>
+            <div class="comp-spec">⚠ Mismo tamaño de fuente en TODAS las tarjetas — Arial Black, mismo pt</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-header" style="background:var(--blue-dark)">③ Gráfico de barras</div>
+          <div class="comp-card-body">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:80px;padding:0 4px;margin-bottom:8px">
+              <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+                <div style="background:#003087;width:100%;border-radius:3px 3px 0 0" id="b1"></div>
+                <div style="font-size:9px;color:var(--text-muted);margin-top:3px">Bogotá</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+                <div style="background:#0063A8;width:100%;border-radius:3px 3px 0 0" id="b2"></div>
+                <div style="font-size:9px;color:var(--text-muted);margin-top:3px">Antioquia</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+                <div style="background:#288DC8;width:100%;border-radius:3px 3px 0 0" id="b3"></div>
+                <div style="font-size:9px;color:var(--text-muted);margin-top:3px">Costa</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+                <div style="background:#93C9E4;width:100%;border-radius:3px 3px 0 0" id="b4"></div>
+                <div style="font-size:9px;color:var(--text-muted);margin-top:3px">Occidente</div>
+              </div>
+            </div>
+            <div class="comp-spec">Barras → comparar · Líneas → tendencias continuas · Torta → proporciones (máx. 5)</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-header" style="background:var(--blue-mid)">④ Tabla jerárquica</div>
+          <div class="comp-card-body">
+            <table style="width:100%;border-collapse:collapse;font-size:11px">
+              <tr>
+                <th style="background:var(--navy);color:white;padding:5px 8px;text-align:left">Territorio</th>
+                <th style="background:var(--navy);color:white;padding:5px 8px;text-align:right">Cajas fís.</th>
+                <th style="background:var(--navy);color:white;padding:5px 8px;text-align:right">Valor neto</th>
+              </tr>
+              <tr>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0">▶ Costa</td>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0;text-align:right;font-weight:700">20.986</td>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0;text-align:right;font-weight:700">453M</td>
+              </tr>
+              <tr style="background:#F4F5F7">
+                <td style="padding:4px 8px 4px 18px;border-bottom:1px solid #F0F0F0">▶ Mojada</td>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0;text-align:right">20.986</td>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0;text-align:right">453M</td>
+              </tr>
+              <tr>
+                <td style="padding:4px 8px 4px 28px;border-bottom:1px solid #F0F0F0;color:var(--text-muted)">Crtg+SA</td>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0;text-align:right;color:var(--text-muted)">13.132</td>
+                <td style="padding:4px 8px;border-bottom:1px solid #F0F0F0;text-align:right;color:var(--text-muted)">305M</td>
+              </tr>
+            </table>
+            <div class="comp-spec">Jerarquía: CEDIS → Ciudad → Jefe → Representante</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:4px">
+        <div class="card-title">Guía de selección de visual</div>
+        <table class="rules-table">
+          <tr>
+            <th>Si quieres mostrar…</th>
+            <th>Usa este visual</th>
+            <th>Evita</th>
+          </tr>
+          <tr>
+            <td>Comparar valores entre categorías</td>
+            <td style="color:var(--blue-mid);font-weight:700">Barras / Columnas</td>
+            <td style="color:var(--danger)">Torta con muchas categorías</td>
+          </tr>
+          <tr>
+            <td>Evolución en el tiempo</td>
+            <td style="color:var(--blue-mid);font-weight:700">Líneas</td>
+            <td style="color:var(--danger)">Barras para fechas continuas</td>
+          </tr>
+          <tr>
+            <td>Proporciones / participación</td>
+            <td style="color:var(--blue-mid);font-weight:700">Torta o Rosquilla (máx. 5)</td>
+            <td style="color:var(--danger)">Más de 5 segmentos</td>
+          </tr>
+          <tr>
+            <td>Métricas clave de negocio</td>
+            <td style="color:var(--blue-mid);font-weight:700">Tarjeta KPI</td>
+            <td style="color:var(--danger)">Tabla o gráfico para métricas simples</td>
+          </tr>
+          <tr>
+            <td>Desglose jerárquico (CEDIS)</td>
+            <td style="color:var(--blue-mid);font-weight:700">Tabla jerárquica</td>
+            <td style="color:var(--danger)">Barras apiladas sin etiquetas claras</td>
+          </tr>
+          <tr>
+            <td>Conversión o embudo de proceso</td>
+            <td style="color:var(--blue-mid);font-weight:700">Embudo (funnel)</td>
+            <td style="color:var(--danger)">Líneas para datos no continuos</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- REGLAS -->
+    <section class="section" id="s-reglas">
+      <div class="section-header">
+        <div class="section-num">05 · Diseño</div>
+        <div class="section-title">Reglas de diseño</div>
+        <div class="section-sub">Principios de alineación, jerarquía y tipología visual</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="card">
+        <div class="card-title">Alineación y bordes</div>
+        <table class="rules-table">
+          <tr><th>✅ Correcto</th><th>❌ Incorrecto</th></tr>
+          <tr><td class="ok">Todos los visuales alineados a cuadrícula</td><td class="no">Elementos flotantes sin referencia</td></tr>
+          <tr><td class="ok">Bordes visibles y consistentes en cada visual</td><td class="no">Visuales sin borde ni marco</td></tr>
+          <tr><td class="ok">Márgenes iguales entre todos los componentes</td><td class="no">Márgenes irregulares o aleatorios</td></tr>
+          <tr><td class="ok">Logo Postobón en esquina superior derecha</td><td class="no">Logo ausente o en posición incorrecta</td></tr>
+          <tr><td class="ok">Paleta corporativa uniforme en todo el reporte</td><td class="no">Mezcla de colores sin relación a la marca</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Jerarquía visual</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="background:#EFF7FD;border:1px solid var(--cyan);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:11px;font-weight:700;color:var(--blue-dark);margin-bottom:6px">Superior</div>
+            <div style="font-size:11px;color:var(--text-muted)">Filtros y KPI<br>Mayor prominencia</div>
+          </div>
+          <div style="background:#F0F7FF;border:1px solid var(--blue);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:11px;font-weight:700;color:var(--blue-dark);margin-bottom:6px">Media</div>
+            <div style="font-size:11px;color:var(--text-muted)">Gráficos principales<br>Mayor espacio visual</div>
+          </div>
+          <div style="background:#F9FAFB;border:1px solid var(--gray-mid);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Inferior</div>
+            <div style="font-size:11px;color:var(--text-muted)">Tablas de detalle<br>Información secundaria</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Reglas de tipología por dato</div>
+        <table class="rules-table">
+          <tr><th>Tipo de dato</th><th>Visual correcto</th><th>Regla específica</th></tr>
+          <tr><td>Comparaciones entre categorías</td><td class="ok">Barras horizontales o columnas</td><td>Ordenar de mayor a menor</td></tr>
+          <tr><td>Tendencias temporales</td><td class="ok">Gráfico de líneas</td><td>Solo para datos continuos en el tiempo</td></tr>
+          <tr><td>Proporciones / participación</td><td class="ok">Torta o rosquilla</td><td>Máximo 5 categorías</td></tr>
+          <tr><td>Métricas clave únicas</td><td class="ok">Tarjeta KPI</td><td>Mismo tamaño en todas las tarjetas</td></tr>
+          <tr><td>Conversión / proceso</td><td class="ok">Embudo (funnel)</td><td>Etapas secuenciales claras</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- CHECKLIST -->
+    <section class="section" id="s-checklist">
+      <div class="section-header">
+        <div class="section-num">06 · Gobernanza</div>
+        <div class="section-title">Checklist de publicación</div>
+        <div class="section-sub">Marca cada criterio cumplido. Mínimo 80% para publicar.</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div id="checklistItems"></div>
+
+      <div class="score-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;color:var(--text-muted)">Puntaje del tablero</span>
+          <span id="scoreLabel" style="font-size:13px;font-weight:700;color:var(--navy)">0 / 14 criterios · 0%</span>
+        </div>
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" id="scoreFill" style="width:0%;background:var(--blue)"></div>
+        </div>
+        <div id="verdictBox" class="verdict" style="background:#EEE;color:#888">Completa el checklist para ver el veredicto</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px">
+        <div style="background:#EAF7EE;border:1px solid var(--success);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-weight:700;color:#1B7A3A;font-size:14px">≥ 80%</div>
+          <div style="color:#2E7D52;font-size:11px;margin-top:3px">APROBADO para publicación</div>
+        </div>
+        <div style="background:#FFF8E1;border:1px solid var(--warning);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-weight:700;color:#E65100;font-size:14px">60 – 79%</div>
+          <div style="color:#BF360C;font-size:11px;margin-top:3px">APROBADO con observaciones</div>
+        </div>
+        <div style="background:#FDECEA;border:1px solid var(--danger);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-weight:700;color:var(--danger);font-size:14px">< 60%</div>
+          <div style="color:#922B21;font-size:11px;margin-top:3px">NO APROBADO · Corregir</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOMENCLATURA -->
+    <section class="section" id="s-nomenclatura">
+      <div class="section-header">
+        <div class="section-num">07 · Gobernanza</div>
+        <div class="section-title">Nomenclatura</div>
+        <div class="section-sub">Convención de nombres obligatoria para todos los tableros publicados</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <!-- FÓRMULA VISUAL -->
+      <div class="card">
+        <div class="card-title">Estructura del nombre</div>
+        <div class="naming-parts" style="align-items:flex-start;gap:0">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div class="naming-part" style="background:var(--navy);min-width:90px">
+              [AAA]<span class="naming-sub">3 letras del área</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:6px;text-align:center;max-width:90px">Sigla corta identificadora del área</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div class="naming-part" style="background:var(--blue-mid);min-width:70px">
+              [NN]<span class="naming-sub">Consecutivo</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:6px;text-align:center;max-width:70px">Número de 2 dígitos: 01, 02…</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+            <div class="naming-part" style="background:var(--blue);width:100%">
+              - Nombre del tablero<span class="naming-sub">Descripción clara del reporte</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:6px;text-align:center">Sin prefijo "APP". El código ya identifica el área.</div>
+          </div>
+        </div>
+
+        <div style="background:var(--navy);border-radius:10px;padding:16px 20px;margin-top:16px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--cyan);margin-bottom:10px">ANATOMÍA DEL CÓDIGO</div>
+          <div style="display:flex;align-items:flex-start;gap:0;font-family:'Arial Black',Arial;font-size:22px;font-weight:900;color:white;letter-spacing:1px">
+            <span id="anat-area" style="color:#93C9E4;border-bottom:3px solid #93C9E4;padding-bottom:2px">BAPP</span><span id="anat-num" style="color:#FCDC00;border-bottom:3px solid #FCDC00;padding-bottom:2px">01</span><span style="color:rgba(255,255,255,.3);margin:0 10px">—</span><span id="anat-name" style="color:white;font-size:18px;border-bottom:3px solid rgba(255,255,255,.3);padding-bottom:2px">Seguimiento de pedidos</span>
+          </div>
+          <div style="display:flex;gap:32px;margin-top:10px">
+            <div style="text-align:center">
+              <div style="font-size:9px;color:#93C9E4;font-weight:700;letter-spacing:1px">SIGLA ÁREA</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">3–4 letras del área</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:9px;color:#FCDC00;font-weight:700;letter-spacing:1px">CONSECUTIVO</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">Número del reporte en el área</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:9px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:1px">NOMBRE DESCRIPTIVO</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">Qué muestra el tablero</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GENERADOR INTERACTIVO -->
+      <div class="card">
+        <div class="card-title">Generador de nombre — pruébalo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:12px;margin-bottom:14px;align-items:end">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px">Área</label>
+            <select id="gen-area" onchange="generateName()" style="width:100%;padding:8px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;background:white;color:var(--text)">
+              <option value="">— Selecciona un área —</option>
+              <option value="BAPP">B2B APP</option>
+              <option value="DLK">Data Lakehouse (DLKH)</option>
+              <option value="IND">Índices de desempeño</option>
+              <option value="BNA">Delta BNA</option>
+              <option value="GLX">Grupo Lux / Glux</option>
+              <option value="VPV">VP Ventas</option>
+              <option value="MKT">Marketing</option>
+              <option value="FIN">Finanzas</option>
+              <option value="LOG">Logística</option>
+              <option value="OPS">Operaciones</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px">Nombre descriptivo del tablero</label>
+            <input id="gen-nombre" type="text" placeholder="Ej: Seguimiento de pedidos" oninput="generateName()" style="width:100%;padding:8px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;color:var(--text)">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px">Consecutivo</label>
+            <input id="gen-num" type="number" min="1" max="99" value="1" oninput="generateName()" style="width:100%;padding:8px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;text-align:center;color:var(--text)">
+          </div>
+        </div>
+
+        <div id="gen-result" style="background:var(--gray-light);border:2px dashed var(--gray-mid);border-radius:10px;padding:18px 20px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Nombre generado aparecerá aquí…</div>
+        </div>
+
+        <div id="gen-breakdown" style="display:none;margin-top:10px;padding:10px 14px;background:#EFF7FD;border-radius:8px;border:1px solid var(--cyan)">
+          <div style="font-size:11px;color:var(--text-muted)">Desglose: <span id="gen-bd-area" style="font-weight:700;color:var(--navy)"></span> <span style="color:var(--text-muted)">→ sigla área</span> &nbsp;+&nbsp; <span id="gen-bd-num" style="font-weight:700;color:var(--blue)"></span> <span style="color:var(--text-muted)">→ consecutivo</span> &nbsp;+&nbsp; <span style="color:var(--text-muted)">guión</span> &nbsp;+&nbsp; <span id="gen-bd-name" style="font-weight:700;color:var(--navy)"></span> <span style="color:var(--text-muted)">→ nombre</span></div>
+        </div>
+      </div>
+
+      <!-- REGISTRO DE ÁREAS -->
+      <div class="card">
+        <div class="card-title">Registro de áreas y sus siglas</div>
+        <table class="rules-table" id="areasTable">
+          <tr>
+            <th>Área</th>
+            <th>Sigla (3–4 letras)</th>
+            <th>Consecutivo actual</th>
+            <th>Ejemplo de nombre</th>
+          </tr>
+          <tr>
+            <td>B2B APP</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">BAPP</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>BAPP01 - Seguimiento de pedidos</code></td>
+          </tr>
+          <tr>
+            <td>Data Lakehouse (DLKH)</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">DLK</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>DLK01 - Índices de desempeño</code></td>
+          </tr>
+          <tr>
+            <td>Delta BNA</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">BNA</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>BNA01 - Seguimiento PSUG</code></td>
+          </tr>
+          <tr>
+            <td>Grupo Lux / Glux</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">GLX</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>GLX01 - Tablero venta clientes</code></td>
+          </tr>
+          <tr>
+            <td>VP Ventas</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">VPV</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>VPV01 - Gestión comercial</code></td>
+          </tr>
+          <tr>
+            <td>Marketing</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">MKT</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>MKT01 - Seguimiento campañas</code></td>
+          </tr>
+          <tr>
+            <td>Finanzas</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">FIN</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>FIN01 - P&amp;L por región</code></td>
+          </tr>
+          <tr>
+            <td>Logística</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">LOG</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>LOG01 - Control de despachos</code></td>
+          </tr>
+          <tr>
+            <td>Operaciones</td>
+            <td><code style="background:#E8F4FD;color:var(--blue-dark);padding:2px 8px;border-radius:4px;font-weight:700">OPS</code></td>
+            <td><span style="background:#EAF7EE;color:#1B7A3A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">01</span></td>
+            <td><code>OPS01 - Indicadores de planta</code></td>
+          </tr>
+        </table>
+        <div style="margin-top:10px;padding:10px 14px;background:#FFF8E1;border:1px solid var(--warning);border-radius:8px;font-size:12px;color:#BF360C">
+          <strong>Regla de consecutivo:</strong> el número es único dentro del área. Si el área B2B APP ya tiene <code>BAPP01</code>, el siguiente tablero de esa área será <code>BAPP02</code>, independientemente del tema.
+        </div>
+      </div>
+
+      <!-- REGLAS ADICIONALES -->
+      <div class="card">
+        <div class="card-title">Reglas de escritura</div>
+        <table class="rules-table">
+          <tr><th>Regla</th><th>✅ Correcto</th><th>❌ Incorrecto</th></tr>
+          <tr>
+            <td>Sigla siempre en mayúsculas</td>
+            <td class="ok"><code>BAPP01</code></td>
+            <td class="no"><code>bapp01</code> / <code>Bapp01</code></td>
+          </tr>
+          <tr>
+            <td>Consecutivo siempre de 2 dígitos</td>
+            <td class="ok"><code>BAPP01</code></td>
+            <td class="no"><code>BAPP1</code></td>
+          </tr>
+          <tr>
+            <td>Separador entre código y nombre</td>
+            <td class="ok"><code>BAPP01 - Nombre</code> (guión con espacios)</td>
+            <td class="no"><code>BAPP01_Nombre</code> / <code>BAPP01:Nombre</code></td>
+          </tr>
+          <tr>
+            <td>Nombre descriptivo en sentence case</td>
+            <td class="ok"><code>Seguimiento de pedidos</code></td>
+            <td class="no"><code>SEGUIMIENTO DE PEDIDOS</code></td>
+          </tr>
+          <tr>
+            <td>Sin el prefijo "APP" suelto</td>
+            <td class="ok"><code>BAPP01 - Seguimiento de pedidos</code></td>
+            <td class="no"><code>APP BAPP01 Seguimiento</code></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- PUBLICACIÓN -->
+    <section class="section" id="s-publicacion">
+      <div class="section-header">
+        <div class="section-num">08 · Gobernanza</div>
+        <div class="section-title">Flujo de publicación</div>
+        <div class="section-sub">Pasos obligatorios antes de publicar cualquier tablero</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div class="card">
+        <div class="card-title">Proceso de publicación</div>
+        <div class="flow">
+          <div class="flow-step">
+            <div class="flow-circle">1</div>
+            <div class="flow-label">Construir</div>
+            <div class="flow-desc">Diseño con checklist<br>Filtros → KPI → Contenido</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle">2</div>
+            <div class="flow-label">Validar</div>
+            <div class="flow-desc">Completar checklist<br>Puntaje ≥ 80%</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle">3</div>
+            <div class="flow-label">Conectar</div>
+            <div class="flow-desc">Fuente de datos<br>Permisos configurados</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle">4</div>
+            <div class="flow-label">Publicar</div>
+            <div class="flow-desc">Workspace correcto<br>Actualización automática</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle">5</div>
+            <div class="flow-label">Documentar</div>
+            <div class="flow-desc">Actualizar contacto<br>Registrar en catálogo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Ruta de acceso en Power BI</div>
+        <div style="background:var(--navy);border-radius:8px;padding:12px 16px;font-family:monospace;font-size:12px;color:var(--cyan);line-height:2">
+          Outlook<span style="color:white"> → </span>Iniciador de apps<span style="color:white"> → </span>Power BI (Fabric)<span style="color:white"> → </span>Áreas de trabajo<span style="color:white"> → </span>[workspace]<span style="color:white"> → </span>Informes<span style="color:white"> → </span>[Tablero]
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Requisitos de datos</div>
+        <table class="rules-table">
+          <tr><th>Requisito</th><th>Detalle</th></tr>
+          <tr><td>Tipos de dato correctos</td><td>Fecha como fecha, texto como texto, número como número — configurar en Power Query</td></tr>
+          <tr><td>Solo campos necesarios</td><td>No cargar columnas sin uso — mejora el rendimiento del tablero</td></tr>
+          <tr><td>Conexión configurada</td><td>Origen correcto con permisos de acceso verificados</td></tr>
+          <tr><td>Categorías geográficas</td><td>Definir categoría de datos en columnas de región, ciudad, departamento</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- PSUG -->
+    <section class="section" id="s-psug">
+      <div class="section-header">
+        <div class="section-num">09 · Referente</div>
+        <div class="section-title">Estilo PSUG</div>
+        <div class="section-sub">Análisis de Impacto Pedido Sugerido · Delta BNA · Piloto 2026</div>
+      </div>
+      <div class="section-divider"></div>
+
+      <div style="background:var(--navy);border-radius:12px;padding:20px;margin-bottom:16px;color:white">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--cyan);margin-bottom:6px">PILOTO · DELTA BNA · SEGUIMIENTO PSUG</div>
+        <div style="font-family:'Arial Black',Arial;font-size:22px;font-weight:900;line-height:1.1;margin-bottom:6px">Análisis de Impacto<br>Pedido Sugerido</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:16px">Ene–Mar 2026 · Clientes constantes activos 2024–2026</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+          <span style="border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:11px">CEDI Rionegro</span>
+          <span style="border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:11px">CEDI Itagüí</span>
+          <span style="border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:11px">2024 · 2025 · 2026</span>
+          <span style="border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:11px">Con sugerido vs Sin sugerido</span>
+        </div>
+        <div style="display:flex;gap:32px">
+          <div><div style="font-family:'Arial Black',Arial;font-size:24px;font-weight:900">2,040</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">CLIENTES CON SUGERIDO</div></div>
+          <div><div style="font-family:'Arial Black',Arial;font-size:24px;font-weight:900">8,646</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">CLIENTES SIN SUGERIDO</div></div>
+          <div><div style="font-family:'Arial Black',Arial;font-size:24px;font-weight:900">2</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">CEDIS</div></div>
+          <div><div style="font-family:'Arial Black',Arial;font-size:24px;font-weight:900">3</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">MESES PILOTO</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Características del estilo PSUG a adoptar</div>
+        <div class="ref-grid">
+          <div class="ref-card">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">Fondo navy profundo</div>
+            <div style="font-size:11px;color:var(--text-muted)">Header oscuro #0A1628 para portadas y secciones de alto impacto. Contraste máximo con texto blanco.</div>
+          </div>
+          <div class="ref-card">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">KPI minimalistas</div>
+            <div style="font-size:11px;color:var(--text-muted)">Números grandes sobre fondo oscuro. Etiqueta pequeña en mayúsculas. Sin bordes innecesarios.</div>
+          </div>
+          <div class="ref-card">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">Breadcrumb de contexto</div>
+            <div style="font-size:11px;color:var(--text-muted)">Siempre indicar área/app/propósito al inicio: "PILOTO · DELTA BNA · SEGUIMIENTO PSUG".</div>
+          </div>
+          <div class="ref-card">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">Chips de filtro redondeados</div>
+            <div style="font-size:11px;color:var(--text-muted)">Bordes redondeados oscuros para filtros activos. Alto contraste sobre fondo navy.</div>
+          </div>
+          <div class="ref-card" style="border-left-color:var(--green)">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">Verde #00B894 para crecimiento</div>
+            <div style="font-size:11px;color:var(--text-muted)">Indicadores de tendencia positiva. Rojo #C0392B para caída. Siempre etiquetar el cambio.</div>
+          </div>
+          <div class="ref-card">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">Numeración de sección</div>
+            <div style="font-size:11px;color:var(--text-muted)">Bloques "01", "02" en pill azul oscuro para identificar claramente cada sección del reporte.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Paleta del referente PSUG</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="width:60px;height:40px;border-radius:6px;background:#0A1628;margin:0 auto 4px"></div>
+            <div style="font-size:9px;color:var(--text-muted)">Navy<br><code>#0A1628</code></div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:60px;height:40px;border-radius:6px;background:#1C5FA8;margin:0 auto 4px"></div>
+            <div style="font-size:9px;color:var(--text-muted)">Azul<br><code>#1C5FA8</code></div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:60px;height:40px;border-radius:6px;background:#00B894;margin:0 auto 4px"></div>
+            <div style="font-size:9px;color:var(--text-muted)">Verde<br><code>#00B894</code></div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:60px;height:40px;border-radius:6px;background:#F4F5F7;border:1px solid #DDD;margin:0 auto 4px"></div>
+            <div style="font-size:9px;color:var(--text-muted)">Fondo<br><code>#F4F5F7</code></div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:60px;height:40px;border-radius:6px;background:#1A2340;margin:0 auto 4px"></div>
+            <div style="font-size:9px;color:var(--text-muted)">Texto<br><code>#1A2340</code></div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:60px;height:40px;border-radius:6px;background:#64748B;margin:0 auto 4px"></div>
+            <div style="font-size:9px;color:var(--text-muted)">Muted<br><code>#64748B</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="copy-toast" id="copyToast">Copiado al portapapeles</div>
+
+<script>
+const primaryColors=[
+  {hex:"003087",name:"Azul oscuro",use:"Header / Títulos"},
+  {hex:"0063A8",name:"Azul medio",use:"Botones / Links"},
+  {hex:"0075BB",name:"Azul principal",use:"Interactivos"},
+  {hex:"288DC8",name:"Azul claro",use:"KPI strip"},
+  {hex:"93C9E4",name:"Cyan",use:"Iconos / Acento"},
+  {hex:"D0EAF6",name:"Cyan suave",use:"Zona de filtros"},
+];
+const neutralColors=[
+  {hex:"1A2340",name:"Texto oscuro",use:"Títulos principales"},
+  {hex:"585859",name:"Texto medio",use:"Cuerpo de texto"},
+  {hex:"888780",name:"Gris oscuro",use:"Etiquetas"},
+  {hex:"CDCDCD",name:"Gris medio",use:"Bordes / Separadores"},
+  {hex:"F4F5F7",name:"Gris claro",use:"Fondos de contenido"},
+  {hex:"FFFFFF",name:"Blanco",use:"Fondo principal"},
+];
+const accentColors=[
+  {hex:"00B894",name:"Verde",use:"Tendencia positiva"},
+  {hex:"FCDC00",name:"Amarillo",use:"Alerta / Atención"},
+  {hex:"D60078",name:"Magenta",use:"Acento de marca"},
+  {hex:"8973A0",name:"Violeta",use:"Categorías secundarias"},
+  {hex:"EFB71B",name:"Dorado",use:"KPI destacado"},
+  {hex:"C63884",name:"Fucsia",use:"Segmento especial"},
+];
+const semanticColors=[
+  {hex:"27AE60",bg:"EAF7EE",textC:"1B7A3A",name:"Éxito",label:"APROBADO · Puntaje ≥ 80%"},
+  {hex:"F39C12",bg:"FFF8E1",textC:"BF360C",name:"Advertencia",label:"OBSERVACIONES · 60–79%"},
+  {hex:"C0392B",bg:"FDECEA",textC:"922B21",name:"Error",label:"NO APROBADO · < 60%"},
+  {hex:"0075BB",bg:"EFF7FD",textC:"003087",name:"Información",label:"INFO · Datos adicionales"},
+];
+
+function copyHex(hex){
+  navigator.clipboard.writeText('#'+hex).catch(()=>{});
+  const t=document.getElementById('copyToast');
+  t.textContent='Copiado: #'+hex;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+function buildColorChip(c,dark){
+  const isLight=['FFFFFF','F4F5F7','D0EAF6','FCDC00','93C9E4','EFB71B'].includes(c.hex);
+  return `<div class="color-chip" onclick="copyHex('${c.hex}')" title="Clic para copiar #${c.hex}">
+    <div class="chip-swatch" style="background:#${c.hex};${isLight?'border-bottom:1px solid #E5E7EB':''}"></div>
+    <div class="chip-info">
+      <span class="chip-name">${c.name}</span>
+      <span class="chip-hex">#${c.hex}</span>
+      <span class="chip-use">${c.use}</span>
+    </div>
+  </div>`;
+}
+
+document.getElementById('primaryColors').innerHTML=primaryColors.map(buildColorChip).join('');
+document.getElementById('neutralColors').innerHTML=neutralColors.map(buildColorChip).join('');
+document.getElementById('accentColors').innerHTML=accentColors.map(buildColorChip).join('');
+document.getElementById('semanticColors').innerHTML=semanticColors.map(c=>`
+  <div class="semantic-card" style="background:#${c.bg};border-color:#${c.hex}">
+    <div style="font-size:13px;font-weight:700;color:#${c.hex};margin-bottom:4px">${c.name}</div>
+    <div style="font-size:11px;color:#${c.textC};margin-bottom:8px">${c.label}</div>
+    <div style="display:inline-block;background:#${c.hex};color:white;font-family:monospace;font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer" onclick="copyHex('${c.hex}')">#${c.hex}</div>
+  </div>`).join('');
+
+const typoRows=[
+  {role:"Título principal",spec:"Arial Black · 24–28pt · Bold",sample:"Índices Desempeño",sz:22,ff:"'Arial Black',Arial",fw:900,col:"#003087",use:"Nombre del dashboard"},
+  {role:"Código de reporte",spec:"Arial Black · 14pt · CAPS · sin espacios en el código",sample:"BAPP01 - Seguimiento de pedidos",sz:13,ff:"'Arial Black',Arial",fw:900,col:"#0063A8",use:"Nomenclatura obligatoria"},
+  {role:"Subtítulo",spec:"Arial Bold · 14–16pt",sample:"Cajas físicas venta",sz:14,ff:"Arial",fw:700,col:"#288DC8",use:"Títulos de gráficos y KPI"},
+  {role:"Valor KPI",spec:"Arial Black · 20–28pt · mismo tamaño en todas",sample:"20.986",sz:24,ff:"'Arial Black',Arial",fw:900,col:"#FFFFFF",bg:"#288DC8",use:"Tarjetas de métricas"},
+  {role:"Cuerpo / Etiquetas",spec:"Arial / Raleway Regular · 11–13pt",sample:"Territorio · Cajas físicas · Valor neta",sz:11,ff:"Arial",fw:400,col:"#64748B",use:"Tablas, ejes, leyendas"},
+  {role:"Pie de contacto",spec:"Arial Regular · 10pt · Gris",sample:"nombre@postobon.com",sz:10,ff:"Arial",fw:400,col:"#888780",use:"Footer obligatorio"},
+];
+document.getElementById('typoRows').innerHTML='<div class="card-title">Jerarquía tipográfica</div>'+typoRows.map(r=>`
+  <div class="typo-row">
+    <div class="typo-meta">
+      <div class="typo-meta-role">${r.role}</div>
+      <div class="typo-meta-spec">${r.spec}</div>
+    </div>
+    <div class="typo-sample" style="font-family:${r.ff};font-size:${r.sz}px;font-weight:${r.fw};color:${r.col};${r.bg?`background:${r.bg};padding:4px 12px;border-radius:6px;display:inline-block`:''}">${r.sample}</div>
+    <span class="typo-badge">${r.use}</span>
+  </div>`).join('');
+
+const checkItems=[
+  {text:"Orden correcto: Filtros → KPI → Información",oblig:true},
+  {text:"Zona de KPI siempre presente (al menos una tarjeta)",oblig:true},
+  {text:"Título con código de nomenclatura: [SIGLA][NN] - Nombre del tablero",oblig:false},
+  {text:"Logo visible en esquina superior derecha",oblig:false},
+  {text:"Contacto del publicador en el pie (nombre + correo)",oblig:false},
+  {text:"Todos los elementos con borde y alineados a cuadrícula",oblig:false},
+  {text:"Paleta de colores corporativa uniforme en todo el tablero",oblig:false},
+  {text:"Jerarquía visual respetada (importante = más espacio)",oblig:false},
+  {text:"Tipología correcta según el dato (barras, líneas, torta)",oblig:false},
+  {text:"Fuente: Arial Black títulos · Arial/Raleway cuerpo",oblig:false},
+  {text:"Mismo tamaño de fuente en TODAS las tarjetas KPI",oblig:false},
+  {text:"Dataset con tipos de dato correctos (fecha, texto, número)",oblig:false},
+  {text:"Conexión a fuente de datos configurada con permisos",oblig:false},
+  {text:"Solo se cargan los campos necesarios (rendimiento)",oblig:false},
+];
+document.getElementById('checklistItems').innerHTML=checkItems.map((c,i)=>`
+  <div class="checklist-item${c.oblig?' oblig':''}" onclick="toggleCheck(this,${i})" data-idx="${i}">
+    <div class="checkbox"></div>
+    <div class="checklist-text">${c.text}<span class="${c.oblig?'badge-oblig':'badge-rec'}">${c.oblig?'OBLIGATORIO':'Recomendado'}</span></div>
+  </div>`).join('');
+
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  el.querySelector('.checkbox').textContent=el.classList.contains('checked')?'✓':'';
+  updateScore();
+}
+
+function updateScore(){
+  const items=document.querySelectorAll('.checklist-item');
+  const checked=document.querySelectorAll('.checklist-item.checked').length;
+  const total=items.length;
+  const pct=Math.round(checked/total*100);
+  const obligOk=document.querySelectorAll('.checklist-item.oblig.checked').length;
+  const obligTotal=document.querySelectorAll('.checklist-item.oblig').length;
+  const fill=document.getElementById('scoreFill');
+  const verdict=document.getElementById('verdictBox');
+  const label=document.getElementById('scoreLabel');
+  fill.style.width=pct+'%';
+  label.textContent=checked+' / '+total+' criterios · '+pct+'%';
+  if(pct>=80&&obligOk===obligTotal){
+    fill.style.background='#27AE60';verdict.style.background='#EAF7EE';verdict.style.color='#1B7A3A';verdict.textContent='✅ APROBADO — Publicar en el workspace correspondiente';
+  } else if(pct>=60&&obligOk===obligTotal){
+    fill.style.background='#F39C12';verdict.style.background='#FFF8E1';verdict.style.color='#E65100';verdict.textContent='⚠️ APROBADO CON OBSERVACIONES — Revisar criterios pendientes antes de compartir';
+  } else if(pct>0){
+    fill.style.background='#C0392B';verdict.style.background='#FDECEA';verdict.style.color='#C0392B';verdict.textContent='❌ NO APROBADO — Corregir criterios obligatorios y alcanzar al menos 60%';
+  } else {
+    fill.style.background='#288DC8';verdict.style.background='#EEE';verdict.style.color='#888';verdict.textContent='Completa el checklist para ver el veredicto';
+  }
+}
+
+function showSection(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sec=document.getElementById('s-'+id);
+  if(sec)sec.classList.add('active');
+  if(el)el.classList.add('active');
+  document.getElementById('mainContent').scrollTop=0;
+}
+
+function filterSearch(q){
+  if(!q){return}
+  const lower=q.toLowerCase();
+  const map={colores:'s-colores',tipografia:'s-tipografia',tipografía:'s-tipografia',color:'s-colores',fuente:'s-tipografia',estructura:'s-estructura',componente:'s-componentes',checklist:'s-checklist',nomenclatura:'s-nomenclatura',publicacion:'s-publicacion',publicación:'s-publicacion',psug:'s-psug',reglas:'s-reglas'};
+  for(const [k,v] of Object.entries(map)){
+    if(lower.includes(k)){
+      const navEl=document.querySelector(`[onclick*="${v.replace('s-','')}"]`);
+      showSection(v.replace('s-',''),navEl);
+      return;
+    }
+  }
+}
+
+function generateName(){
+  const area=document.getElementById('gen-area').value;
+  const nombre=document.getElementById('gen-nombre').value.trim();
+  const numRaw=parseInt(document.getElementById('gen-num').value)||1;
+  const num=String(Math.min(99,Math.max(1,numRaw))).padStart(2,'0');
+  const result=document.getElementById('gen-result');
+  const breakdown=document.getElementById('gen-breakdown');
+
+  if(!area&&!nombre){
+    result.innerHTML='<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Nombre generado aparecerá aquí…</div>';
+    breakdown.style.display='none';
+    return;
+  }
+  const areaLabel=area||'???';
+  const nombreLabel=nombre||'Nombre del tablero';
+  const code=areaLabel+num;
+  const full=code+' - '+nombreLabel;
+  result.innerHTML=`
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Nombre del tablero en Power BI:</div>
+    <div style="font-family:'Arial Black',Arial;font-size:20px;font-weight:900;color:var(--navy);letter-spacing:.5px;margin-bottom:10px">${full}</div>
+    <button onclick="navigator.clipboard.writeText('${full.replace(/'/g,"\\'")}').catch(()=>{});const t=document.getElementById('copyToast');t.textContent='Copiado: ${full.replace(/'/g,"\\'")}';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)" style="background:var(--navy);color:white;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer">Copiar nombre</button>
+  `;
+  result.style.background='white';
+  result.style.borderColor='var(--blue)';
+  result.style.borderStyle='solid';
+
+  document.getElementById('gen-bd-area').textContent=areaLabel;
+  document.getElementById('gen-bd-num').textContent=num;
+  document.getElementById('gen-bd-name').textContent=nombreLabel;
+  breakdown.style.display='block';
+
+  document.getElementById('anat-area').textContent=areaLabel;
+  document.getElementById('anat-num').textContent=num;
+  document.getElementById('anat-name').textContent=nombreLabel;
+}
+
+document.getElementById('b2').style.height='52px';
+document.getElementById('b3').style.height='42px';
+document.getElementById('b4').style.height='28px';
+</script>
+</body>
+</html>
